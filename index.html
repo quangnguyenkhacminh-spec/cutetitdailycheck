@@ -32,25 +32,29 @@
         body, html {
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             font-family: var(--font-body);
+            background-color: #fff6f9;
         }
 
         /* ================= NỀN CHUNG & QUẢN LÝ MÀN HÌNH ================= */
         .screen {
             position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transition: opacity 0.4s ease;
             z-index: 1;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .screen.active {
@@ -1096,7 +1100,7 @@
         }
 
         /* =========================================================================
-           6. HỘP QUÀ 4: VŨ TRỤ 3D - TRÁI TIM HỒNG PHÓNG TO -> TÁCH THÀNH CHỮ
+           6. HỘP QUÀ 4: VŨ TRỤ 3D - TRÁI TIM HỒNG (TOÀN BỘ HẠT MÀU HỒNG + CHỮ TO RÕ)
            ========================================================================= */
         function startCosmicHeartToTextAnimation() {
             const canvas = document.getElementById('cosmic-canvas');
@@ -1118,7 +1122,8 @@
                 offCanvas.height = height;
                 const octx = offCanvas.getContext('2d');
 
-                const fontSize = Math.min(width * 0.072, 64);
+                // PHÓNG TO CỠ CHỮ HƠN NỮA ĐỂ DỄ NHÌN VÀ NỔI BẬT
+                const fontSize = Math.min(width * 0.095, 82);
                 octx.font = `700 ${fontSize}px 'Fredoka', 'Nunito', sans-serif`;
                 octx.fillStyle = '#ffffff';
                 octx.textAlign = 'center';
@@ -1141,7 +1146,7 @@
             }
 
             const textPoints = getTextTargetPoints('Tớ yêu ebe của tớ lắm');
-            const totalParticles = Math.max(textPoints.length, 2200);
+            const totalParticles = Math.max(textPoints.length, 2500);
 
             const particles = [];
             for (let i = 0; i < totalParticles; i++) {
@@ -1152,17 +1157,19 @@
                 const hz = (Math.random() - 0.5) * 14 * (1 - fillScale * 0.5);
 
                 const target = textPoints[i % textPoints.length];
-                const pinkShades = ['#ff4d6d', '#ff758f', '#ff8fa3', '#ffb3c1', '#ff0a54', '#ffffff'];
+                
+                // ĐẢM BẢO 100% HẠT ĐỀU LÀ CÁC Tông MÀU HỒNG/ĐỎ HỒNG/TRẮNG HỒNG LẤP LÁNH
+                const pinkShades = ['#ff2a6d', '#ff4d6d', '#ff758f', '#ff8fa3', '#ffb3c1', '#ff0a54', '#ffe6ec'];
 
                 particles.push({
                     hx, hy, hz,
                     x: width / 2,
                     y: height / 2,
-                    vx: (Math.random() - 0.5) * 14,
-                    vy: (Math.random() - 0.5) * 14,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 0.5) * 16,
                     tx: target.x,
                     ty: target.y,
-                    size: Math.random() * 2.2 + 1.1,
+                    size: Math.random() * 2.5 + 1.2,
                     color: pinkShades[Math.floor(Math.random() * pinkShades.length)]
                 });
             }
@@ -1178,7 +1185,7 @@
                 stars.forEach(s => {
                     s.alpha += s.speed;
                     const a = 0.3 + Math.abs(Math.sin(s.alpha)) * 0.7;
-                    ctx.fillStyle = `rgba(255, 230, 240, ${a})`;
+                    ctx.fillStyle = `rgba(255, 200, 220, ${a})`;
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
                     ctx.fill();
