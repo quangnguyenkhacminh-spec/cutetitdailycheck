@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cutetitdaily</title>
+    <!-- Nhúng Google Fonts nét tròn đáng yêu hỗ trợ tiếng Việt đầy đủ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pink-bg: #ffe6ee;
+            --pink-stripe: rgba(255, 117, 151, 0.28);
+            --red-stripe: rgba(220, 38, 38, 0.16);
+            --crimson-christmas: #c9184a;
+            --rose-main: #ff4d6d;
+            --rose-soft: #ff8fa3;
+            --font-round: 'Fredoka', 'Nunito', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-body);
+        }
+
+        /* ================= NỀN CHUNG & QUẢN LÝ MÀN HÌNH ================= */
+        .screen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* ================= TRANG 1: NỀN CARO GIÁNG SINH HỒNG ĐỎ TRẮNG ================= */
+        #screen-passcode {
+            background-color: #fff5f7;
+            background-image: 
+                repeating-linear-gradient(90deg, var(--pink-stripe) 0px, var(--pink-stripe) 36px, transparent 36px, transparent 72px),
+                repeating-linear-gradient(0deg, var(--red-stripe) 0px, var(--red-stripe) 36px, transparent 36px, transparent 72px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 18px, transparent 18px, transparent 36px);
+        }
+
+        .passcode-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border: 4px solid #ffb3c1;
+            border-radius: 32px;
+            padding: 32px 28px;
+            box-shadow: 0 18px 40px rgba(201, 24, 74, 0.18);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        /* 3 ô chữ nhật dọc xếp hàng ngang */
+        .digit-display-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .digit-box {
+            width: 58px;
+            height: 82px;
+            background: #fff0f3;
+            border: 3px solid #ff758f;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-round);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c9184a;
+            box-shadow: inset 0 4px 8px rgba(255, 117, 143, 0.15);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
+        }
+
+        .digit-box.filled {
+            transform: scale(1.06);
+            border-color: #c9184a;
+            background: #ffffff;
+        }
+
+        /* Hiệu ứng rung khi nhập sai */
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        .digit-display-row.shake {
+            animation: shakeError 0.45s ease-in-out;
+        }
+
+        /* Bàn phím số 1-9 kích thước nhỏ hơn */
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .key-btn {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            border: 2.5px solid #ffccd5;
+            background: #ffffff;
+            font-family: var(--font-round);
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: #ff4d6d;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ffb3c1;
+            transition: all 0.12s ease;
+        }
+
+        .key-btn:hover {
+            background: #fff0f3;
+            transform: translateY(-2px);
+        }
+
+        .key-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #ffb3c1;
+        }
+
+        .hint-text {
+            color: #d90429;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+        }
+
+        .status-msg {
+            min-height: 24px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            text-align: center;
+            transition: opacity 0.25s ease;
+        }
+
+        .status-correct {
+            color: #16a34a;
+        }
+
+        .status-incorrect {
+            color: #dc2626;
+        }
+
+        /* ================= NỀN TRANG 2 & CÁC HỘP QUÀ 1, 2, 3 (TRÁI TIM CÁCH ĐIỆU UỐN ÉO) ================= */
+        .heart-swirl-bg {
+            background-color: #fff6f9;
+            position: relative;
+        }
+
+        .bg-hearts-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ================= TRANG 2: CHỌN HỘP QUÀ ================= */
+        .cat-sticker {
+            width: 115px;
+            height: 115px;
+            margin-bottom: -8px;
+            animation: floatGentle 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 14px rgba(255, 77, 109, 0.2));
+        }
+
+        @keyframes floatGentle {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .pick-title {
+            font-family: var(--font-round);
+            font-size: clamp(2.1rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #ff4d6d;
+            text-shadow: 2px 3px 0px #ffffff, 0 6px 15px rgba(255, 77, 109, 0.25);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .gifts-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .gift-card {
+            width: 155px;
+            height: 170px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ffc2d1;
+            border-radius: 26px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 10px 24px rgba(255, 117, 143, 0.18);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 16px 32px rgba(255, 77, 109, 0.28);
+            border-color: #ff4d6d;
+        }
+
+        .gift-card.opened-badge::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #22c55e;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
+        }
+
+        .gift-svg {
+            width: 105px;
+            height: 105px;
+            transition: transform 0.4s ease;
+        }
+
+        /* Hiệu ứng mở nắp hộp quà khi click */
+        .gift-card.opening .gift-lid {
+            animation: lidPopOpen 0.65s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+        }
+
+        .gift-card.opening .gift-svg {
+            animation: boxBounce 0.65s ease;
+        }
+
+        @keyframes lidPopOpen {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-28px) rotate(-14deg); opacity: 1; }
+            100% { transform: translateY(-48px) rotate(-25deg) scale(1.1); opacity: 0; }
+        }
+
+        @keyframes boxBounce {
+            0%, 100% { transform: scale(1); }
+            35% { transform: scale(1.18, 0.88); }
+            70% { transform: scale(0.95, 1.08); }
+        }
+
+        /* Nút sang trang cuối xuất hiện sau khi mở đủ 4 hộp */
+        #final-cta-wrap {
+            margin-top: 32px;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .final-btn {
+            background: linear-gradient(135deg, #ff4d6d, #c9184a);
+            color: #ffffff;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 999px;
+            font-family: var(--font-round);
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(201, 24, 74, 0.35);
+            animation: pulseGlow 1.8s infinite;
+            display: none;
+        }
+
+        .final-btn.visible {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 25px rgba(201, 24, 74, 0.35); }
+            50% { transform: scale(1.06); box-shadow: 0 14px 32px rgba(201, 24, 74, 0.55); }
+        }
+
+        /* ================= NÚT BACK DÙNG CHUNG Ở DƯỚI CÙNG Ở GIỮA ================= */
+        .back-btn {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.92);
+            border: 2.5px solid #ff8fa3;
+            color: #c9184a;
+            padding: 9px 22px;
+            border-radius: 999px;
+            font-family: var(--font-round);
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(201, 24, 74, 0.18);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #ff4d6d;
+            color: #ffffff;
+            border-color: #ff4d6d;
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .back-btn.dark-mode {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(6px);
+            border-color: rgba(255, 143, 163, 0.6);
+            color: #ffb3c1;
+        }
+
+        .back-btn.dark-mode:hover {
+            background: #ff4d6d;
+            color: #ffffff;
+        }
+
+        /* ================= HỘP QUÀ 1: HOA Ở GIỮA + 10 CÂU LƠ LỬNG 2 BÊN ================= */
+        .gift1-title {
+            font-family: var(--font-round);
+            font-size: clamp(1.7rem, 4.2vw, 2.5rem);
+            font-weight: 700;
+            color: #c9184a;
+            text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 18px;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .flower-stage {
+            position: relative;
+            width: 100%;
+            max-width: 960px;
+            height: 62vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .floating-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 100%;
+            width: 34%;
+            z-index: 4;
+        }
+
+        .floating-col.left {
+            align-items: flex-end;
+            padding-right: 12px;
+        }
+
+        .floating-col.right {
+            align-items: flex-start;
+            padding-left: 12px;
+        }
+
+        .xmas-pink-phrase {
+            font-family: var(--font-round);
+            font-size: clamp(1rem, 2.1vw, 1.35rem);
+            font-weight: 700;
+            color: #d62857; /* Hồng son đậm chất giáng sinh */
+            background: rgba(255, 255, 255, 0.88);
+            border: 2px solid #ff8fa3;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 6px 16px rgba(214, 40, 87, 0.16);
+            white-space: nowrap;
+            animation: floatPhrase 3.4s ease-in-out infinite;
+        }
+
+        .floating-col.left .xmas-pink-phrase:nth-child(odd) { animation-delay: 0.2s; transform: rotate(-3deg); }
+        .floating-col.left .xmas-pink-phrase:nth-child(even) { animation-delay: 0.9s; transform: rotate(2deg); }
+        .floating-col.right .xmas-pink-phrase:nth-child(odd) { animation-delay: 0.5s; transform: rotate(3deg); }
+        .floating-col.right .xmas-pink-phrase:nth-child(even) { animation-delay: 1.2s; transform: rotate(-2deg); }
+
+        @keyframes floatPhrase {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-9px); }
+        }
+
+        .center-flower {
+            width: clamp(160px, 26vw, 240px);
+            height: clamp(160px, 26vw, 240px);
+            z-index: 3;
+            animation: swayFlower 4s ease-in-out infinite;
+            filter: drop-shadow(0 12px 24px rgba(201, 24, 74, 0.22));
+        }
+
+        @keyframes swayFlower {
+            0%, 100% { transform: scale(1) rotate(-3deg); }
+            50% { transform: scale(1.05) rotate(3deg); }
+        }
+
+        /* ================= HỘP QUÀ 2: PHONG BÌ THƯ & LÁ THƯ RÚT LÊN ================= */
+        .mail-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 540px;
+        }
+
+        .envelope-box {
+            position: relative;
+            width: 310px;
+            height: 205px;
+            background: #ffccd5;
+            border-radius: 18px;
+            box-shadow: 0 18px 36px rgba(201, 24, 74, 0.22);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, opacity 0.4s ease;
+            border: 3px solid #ff8fa3;
+        }
+
+        .envelope-box:hover {
+            transform: scale(1.04);
+        }
+
+        /* Nắp phong bì */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 110px;
+            background: #ff8fa3;
+            clip-path: polygon(0 0, 50% 85%, 100% 0);
+            border-radius: 15px 15px 0 0;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 2;
+        }
+
+        .envelope-box.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* Dấu chấm than trắng trong vòng tròn đỏ nhỏ ở góc phải trên */
+        .mail-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 34px;
+            height: 34px;
+            background: #e63946;
+            color: #ffffff;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            font-family: var(--font-round);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.45);
+            z-index: 5;
+            animation: badgeBounce 1.4s infinite;
+        }
+
+        @keyframes badgeBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+        }
+
+        .mail-label {
+            position: relative;
+            z-index: 4;
+            margin-top: 68px;
+            background: #ffffff;
+            color: #c9184a;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-family: var(--font-round);
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(201, 24, 74, 0.15);
+        }
+
+        /* Tờ giấy rút lên */
+        .letter-paper {
+            display: none;
+            width: 92vw;
+            max-width: 520px;
+            max-height: 74vh;
+            overflow-y: auto;
+            background: #fffdf9;
+            background-image: linear-gradient(to bottom, transparent 95%, rgba(255, 179, 193, 0.25) 96%);
+            background-size: 100% 28px;
+            border: 3px solid #ffb3c1;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(201, 24, 74, 0.25);
+            /* Căn lề trái, cách mép trên mép dưới khoảng 0.5 tới 1 cm (~28px) */
+            padding: 28px 26px;
+            text-align: left;
+            color: #4a1525;
+            font-size: 0.98rem;
+            line-height: 1.65;
+            font-weight: 700;
+            animation: pullPaperUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            margin-bottom: 36px;
+        }
+
+        .letter-paper.visible {
+            display: block;
+        }
+
+        .letter-paper p {
+            margin-bottom: 10px;
+        }
+
+        .letter-paper p:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes pullPaperUp {
+            0% {
+                opacity: 0;
+                transform: translateY(90px) scale(0.85);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ================= HỘP QUÀ 3: KHĂN QUÀNG TRẮNG TO ================= */
+        .scarf-title {
+            font-family: var(--font-round);
+            font-size: clamp(2rem, 4.5vw, 2.8rem);
+            font-weight: 700;
+            color: #ff4d6d;
+            text-shadow: 2px 3px 0 #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .scarf-container {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .scarf-container:hover {
+            transform: scale(1.05);
+        }
+
+        .scarf-container:active {
+            transform: scale(0.96);
+        }
+
+        .scarf-svg {
+            width: clamp(240px, 42vw, 330px);
+            height: auto;
+            filter: drop-shadow(0 14px 28px rgba(201, 24, 74, 0.18));
+        }
+
+        .scarf-messages {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 92px;
+        }
+
+        .scarf-bubble {
+            background: #ffffff;
+            border: 2.5px solid #ff758f;
+            color: #c9184a;
+            font-family: var(--font-round);
+            font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+            font-weight: 700;
+            padding: 10px 22px;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.18);
+            opacity: 0;
+            transform: translateY(15px) scale(0.9);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .scarf-bubble.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .pop-sticker {
+            position: fixed;
+            pointer-events: none;
+            z-index: 25;
+            animation: popStickerFly 1.8s ease-out forwards;
+        }
+
+        @keyframes popStickerFly {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+            }
+            25% {
+                opacity: 1;
+                transform: translate(-50%, -70%) scale(1.15) rotate(-10deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0.9) rotate(18deg);
+            }
+        }
+
+        /* ================= HỘP QUÀ 4 & TRANG CUỐI: VŨ TRỤ HẠT HỒNG 3D ================= */
+        #screen-gift-4, #screen-final {
+            background: #030108;
+            padding: 0;
+        }
+
+        #cosmic-canvas, #final-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .final-overlay-text {
+            position: relative;
+            z-index: 15;
+            text-align: center;
+            color: #ffffff;
+            padding: 24px;
+            max-width: 680px;
+            pointer-events: none;
+            animation: fadeInScale 1.4s ease forwards;
+        }
+
+        .final-overlay-text h1 {
+            font-family: var(--font-round);
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: #ff8fa3;
+            text-shadow: 0 0 24px rgba(255, 77, 109, 0.85);
+            margin-bottom: 16px;
+        }
+
+        .final-overlay-text p {
+            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+            line-height: 1.7;
+            color: #ffe5ec;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsive cho màn hình điện thoại nhỏ */
+        @media (max-width: 680px) {
+            .flower-stage {
+                flex-direction: column;
+                height: auto;
+                gap: 12px;
+                margin-bottom: 45px;
+            }
+            .floating-col {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                height: auto;
+                padding: 0 !important;
+            }
+            .xmas-pink-phrase {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            .center-flower {
+                width: 135px;
+                height: 135px;
+            }
+            .gift-card {
+                width: 135px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== TRANG 1: NHẬP PASSCODE ==================== -->
+    <section id="screen-passcode" class="screen active">
+        <div class="passcode-card">
+            <!-- 3 ô hình chữ nhật dọc xếp thành hàng ngang -->
+            <div class="digit-display-row" id="digit-row">
+                <div class="digit-box" id="box-0"></div>
+                <div class="digit-box" id="box-1"></div>
+                <div class="digit-box" id="box-2"></div>
+            </div>
+
+            <!-- 9 ô số từ 1 tới 9 -->
+            <div class="keypad-grid">
+                <button class="key-btn" onclick="pressDigit('1')">1</button>
+                <button class="key-btn" onclick="pressDigit('2')">2</button>
+                <button class="key-btn" onclick="pressDigit('3')">3</button>
+                <button class="key-btn" onclick="pressDigit('4')">4</button>
+                <button class="key-btn" onclick="pressDigit('5')">5</button>
+                <button class="key-btn" onclick="pressDigit('6')">6</button>
+                <button class="key-btn" onclick="pressDigit('7')">7</button>
+                <button class="key-btn" onclick="pressDigit('8')">8</button>
+                <button class="key-btn" onclick="pressDigit('9')">9</button>
+            </div>
+
+            <div class="hint-text">Hint: My lover's birthday</div>
+            <div class="status-msg" id="passcode-status"></div>
+        </div>
+    </section>
+
+    <!-- ==================== TRANG 2: CHỌN 4 HỘP QUÀ ==================== -->
+    <section id="screen-gifts" class="screen heart-swirl-bg">
+        <div class="bg-hearts-layer" id="hearts-bg-2"></div>
+        <div class="content-layer">
+            <!-- Sticker mèo đáng yêu -->
+            <svg class="cat-sticker" viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Tai mèo -->
+                <path d="M28 52 L22 18 L54 36 Z" fill="#FFFFFF" stroke="#FF758F" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M32 46 L28 25 L48 37 Z" fill="#FFB3C1"/>
+                <path d="M112 52 L118 18 L86 36 Z" fill="#FFFFFF" stroke="#FF758F" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M108 46 L112 25 L92 37 Z" fill="#FFB3C1"/>
+                <!-- Đầu mèo -->
+                <ellipse cx="70" cy="74" rx="48" ry="40" fill="#FFFFFF" stroke="#FF758F" stroke-width="4"/>
+                <!-- Má hồng -->
+                <ellipse cx="42" cy="80" rx="8" ry="5" fill="#FF8FA3" opacity="0.65"/>
+                <ellipse cx="98" cy="80" rx="8" ry="5" fill="#FF8FA3" opacity="0.65"/>
+                <!-- Mắt long lanh -->
+                <circle cx="50" cy="68" r="6" fill="#4A1525"/>
+                <circle cx="48" cy="66" r="2" fill="#FFFFFF"/>
+                <circle cx="90" cy="68" r="6" fill="#4A1525"/>
+                <circle cx="88" cy="66" r="2" fill="#FFFFFF"/>
+                <!-- Mũi và miệng mèo -->
+                <path d="M66 76 Q70 80 74 76" fill="#FF4D6D"/>
+                <path d="M60 83 Q65 89 70 83 Q75 89 80 83" stroke="#4A1525" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <!-- Râu mèo -->
+                <line x1="16" y1="70" x2="30" y2="73" stroke="#FF758F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="15" y1="80" x2="29" y2="80" stroke="#FF758F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="124" y1="70" x2="110" y2="73" stroke="#FF758F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="125" y1="80" x2="111" y2="80" stroke="#FF758F" stroke-width="3" stroke-linecap="round"/>
+                <!-- Trái tim nhỏ trên đầu -->
+                <path d="M70 28 C70 28 60 20 64 14 C67 10 70 15 70 15 C70 15 73 10 76 14 C80 20 70 28 70 28 Z" fill="#FF4D6D"/>
+            </svg>
+
+            <h1 class="pick-title">Pick your gift</h1>
+
+            <div class="gifts-row">
+                <!-- Hộp quà 1: Hồng dâu nơ vàng -->
+                <div class="gift-card" id="gift-card-1" onclick="openGift(1)">
+                    <svg class="gift-svg" viewBox="0 0 120 120">
+                        <rect x="22" y="52" width="76" height="54" rx="10" fill="#FF758F"/>
+                        <rect x="53" y="52" width="14" height="54" fill="#FFD166"/>
+                        <g class="gift-lid">
+                            <rect x="16" y="38" width="88" height="18" rx="7" fill="#FF4D6D"/>
+                            <rect x="53" y="38" width="14" height="18" fill="#FFD166"/>
+                            <path d="M60 38 C45 18 32 28 45 38 Z" fill="#FFD166"/>
+                            <path d="M60 38 C75 18 88 28 75 38 Z" fill="#FFD166"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Hộp quà 2: Đỏ Giáng sinh nơ trắng chấm bi -->
+                <div class="gift-card" id="gift-card-2" onclick="openGift(2)">
+                    <svg class="gift-svg" viewBox="0 0 120 120">
+                        <rect x="22" y="52" width="76" height="54" rx="10" fill="#E63946"/>
+                        <circle cx="36" cy="68" r="3" fill="#FFF" opacity="0.7"/>
+                        <circle cx="84" cy="88" r="3" fill="#FFF" opacity="0.7"/>
+                        <circle cx="38" cy="92" r="3" fill="#FFF" opacity="0.7"/>
+                        <circle cx="82" cy="66" r="3" fill="#FFF" opacity="0.7"/>
+                        <rect x="53" y="52" width="14" height="54" fill="#FFFFFF"/>
+                        <g class="gift-lid">
+                            <rect x="16" y="38" width="88" height="18" rx="7" fill="#C9184A"/>
+                            <rect x="53" y="38" width="14" height="18" fill="#FFFFFF"/>
+                            <path d="M60 38 C42 16 30 30 46 38 Z" fill="#FFFFFF"/>
+                            <path d="M60 38 C78 16 90 30 74 38 Z" fill="#FFFFFF"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Hộp quà 3: Xanh mint pastel nơ hồng -->
+                <div class="gift-card" id="gift-card-3" onclick="openGift(3)">
+                    <svg class="gift-svg" viewBox="0 0 120 120">
+                        <rect x="22" y="52" width="76" height="54" rx="10" fill="#80ED99"/>
+                        <rect x="53" y="52" width="14" height="54" fill="#FF758F"/>
+                        <g class="gift-lid">
+                            <rect x="16" y="38" width="88" height="18" rx="7" fill="#57CC99"/>
+                            <rect x="53" y="38" width="14" height="18" fill="#FF758F"/>
+                            <path d="M60 38 C44 18 30 28 46 38 Z" fill="#FF4D6D"/>
+                            <path d="M60 38 C76 18 90 28 74 38 Z" fill="#FF4D6D"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Hộp quà 4: Tím lavender nơ hồng phấn -->
+                <div class="gift-card" id="gift-card-4" onclick="openGift(4)">
+                    <svg class="gift-svg" viewBox="0 0 120 120">
+                        <rect x="22" y="52" width="76" height="54" rx="10" fill="#BDB2FF"/>
+                        <rect x="53" y="52" width="14" height="54" fill="#FFC6FF"/>
+                        <g class="gift-lid">
+                            <rect x="16" y="38" width="88" height="18" rx="7" fill="#9B5DE5"/>
+                            <rect x="53" y="38" width="14" height="18" fill="#FFC6FF"/>
+                            <path d="M60 38 C44 18 30 28 46 38 Z" fill="#FF8FA3"/>
+                            <path d="M60 38 C76 18 90 28 74 38 Z" fill="#FF8FA3"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="final-cta-wrap">
+                <button id="btn-to-final" class="final-btn" onclick="goToFinalScreen()">
+                    ✨ Mở món quà cuối cùng nè ✨
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HỘP QUÀ 1: HOA & LỜI KHEN LƠ LỬNG ==================== -->
+    <section id="screen-gift-1" class="screen heart-swirl-bg">
+        <div class="bg-hearts-layer" id="hearts-bg-g1"></div>
+        <div class="content-layer">
+            <h2 class="gift1-title">Tớ muốn nói với ebe của tớ</h2>
+
+            <div class="flower-stage">
+                <!-- Cột bên trái: 5 câu -->
+                <div class="floating-col left">
+                    <div class="xmas-pink-phrase">Ebe ơi tớ nhớ ebe</div>
+                    <div class="xmas-pink-phrase">Đồ đáng yêu</div>
+                    <div class="xmas-pink-phrase">Tít cte</div>
+                    <div class="xmas-pink-phrase">Ebe dyeuuu</div>
+                    <div class="xmas-pink-phrase">Ebe xinh v trui</div>
+                </div>
+
+                <!-- Bông hoa lớn ở giữa -->
+                <svg class="center-flower" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cành và lá -->
+                    <path d="M110 125 Q106 170 110 212" stroke="#40916C" stroke-width="8" stroke-linecap="round" fill="none"/>
+                    <path d="M108 168 C78 155 68 175 108 182 Z" fill="#52B788"/>
+                    <path d="M112 156 C142 143 152 163 112 170 Z" fill="#52B788"/>
+                    <!-- Các cánh hoa hồng phấn rực rỡ -->
+                    <circle cx="110" cy="52" r="30" fill="#FF758F"/>
+                    <circle cx="152" cy="76" r="30" fill="#FF8FA3"/>
+                    <circle cx="142" cy="122" r="30" fill="#FF758F"/>
+                    <circle cx="78" cy="122" r="30" fill="#FF8FA3"/>
+                    <circle cx="68" cy="76" r="30" fill="#FF758F"/>
+                    <!-- Nhụy hoa cười đáng yêu -->
+                    <circle cx="110" cy="92" r="28" fill="#FFD166" stroke="#F4A261" stroke-width="3"/>
+                    <circle cx="101" cy="88" r="3.2" fill="#4A1525"/>
+                    <circle cx="119" cy="88" r="3.2" fill="#4A1525"/>
+                    <path d="M103 97 Q110 104 117 97" stroke="#4A1525" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </svg>
+
+                <!-- Cột bên phải: 5 câu -->
+                <div class="floating-col right">
+                    <div class="xmas-pink-phrase">Ngầu qu ebe</div>
+                    <div class="xmas-pink-phrase">Ebe giỏi qu ta</div>
+                    <div class="xmas-pink-phrase">Ebe ngoan quaa</div>
+                    <div class="xmas-pink-phrase">Ebe dthuongg</div>
+                    <div class="xmas-pink-phrase">Ebe là s1tg</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="backToGifts()">← Back</button>
+    </section>
+
+    <!-- ==================== HỘP QUÀ 2: MAIL & LÁ THƯ ==================== -->
+    <section id="screen-gift-2" class="screen heart-swirl-bg">
+        <div class="bg-hearts-layer" id="hearts-bg-g2"></div>
+        <div class="content-layer">
+            <div class="mail-wrapper">
+                <!-- Phong bì thư -->
+                <div class="envelope-box" id="envelope-box" onclick="openMailLetter()">
+                    <div class="mail-badge">!</div>
+                    <div class="envelope-flap"></div>
+                    <!-- Trái tim niêm phong -->
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="#E63946" style="z-index: 3; margin-top: 10px;">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <div class="mail-label">Bạn có mail gửi tớiii</div>
+                </div>
+
+                <!-- Tờ giấy rút lên -->
+                <div class="letter-paper" id="letter-paper">
+                    <p>To ebe dyeuu của tớ,</p>
+                    <p>Ebe ơi tớ cảm ơn ebe vì đã cho tớ được ở cạnh và hiểu thêm về ebeee</p>
+                    <p>Tớ sẽ trân trọng ebee</p>
+                    <p>Mặc dù có nhiều phần tớ vẫn chưa tốt nhưng mà lúc nào tớ cũng lo cho ebe hết á nên tớ sẽ học để tốt hơn nhaa</p>
+                    <p>Thời gian sắp tới, tớ biết ebe giỏi lắm ý, ebe sẽ lock in và cgang thật nhiều. Nma em bé của tớ ơi, ebe hãy nhớ là luôn có tớ ở cạnh ebe nha, em bé khom 1 mình đâuuu</p>
+                    <p>Tớ yêu ebe của tớ lắm nên tớ cũng hơi lo nên ebe phải làm theo bản cam kết đóoo</p>
+                    <p>Tớ lúc nào cũng cạnh ebee nên khi nào ebe mệt muốn nghỉ ngơi chút xíu thì luôn có thể dựa vai tớ chở đi ăn hay đi dạo nhaaa</p>
+                    <p>Cuối cùng tớ chúc ebee tgian tới sẽ vui vẻ mà khoe với mng thành quả nhée</p>
+                    <p>Còn với tớ, ebe lnao cũng là ebe đáng yêu, tớ chỉ muốn ebe cgang hết sức để khong phải tiếc thoaii còn những điều còn lại thì tớ chả quan tâmm!</p>
+                    <p>From tớ.</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="backToGifts()">← Back</button>
+    </section>
+
+    <!-- ==================== HỘP QUÀ 3: KHĂN QUÀNG TRẮNG TO ==================== -->
+    <section id="screen-gift-3" class="screen heart-swirl-bg">
+        <div class="bg-hearts-layer" id="hearts-bg-g3"></div>
+        <div class="content-layer">
+            <h2 class="scarf-title">Scarf for you</h2>
+
+            <div class="scarf-container" onclick="triggerScarfEffect(event)">
+                <!-- Sticker khăn quàng trắng to đáng yêu -->
+                <svg class="scarf-svg" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Hai dải khăn rủ xuống -->
+                    <path d="M92 95 L76 205 L122 205 L128 95 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M152 95 L164 215 L210 210 L192 95 Z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="4" stroke-linejoin="round"/>
+                    <!-- Sọc pastel nhẹ trang trí trên dải khăn -->
+                    <line x1="80" y1="180" x2="124" y2="180" stroke="#FFB3C1" stroke-width="5"/>
+                    <line x1="162" y1="190" x2="207" y2="187" stroke="#FFB3C1" stroke-width="5"/>
+                    <!-- Tua rua dưới đuôi khăn -->
+                    <line x1="82" y1="205" x2="80" y2="222" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="94" y1="205" x2="93" y2="222" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="106" y1="205" x2="106" y2="222" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="118" y1="205" x2="118" y2="222" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+
+                    <line x1="170" y1="214" x2="170" y2="231" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="182" y1="213" x2="183" y2="230" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="194" y1="212" x2="195" y2="229" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="205" y1="210" x2="207" y2="227" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+
+                    <!-- Vòng khăn quấn cổ bồng bềnh -->
+                    <rect x="52" y="42" width="176" height="62" rx="31" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="5"/>
+                    <!-- Nếp gấp len mềm mại -->
+                    <path d="M85 60 Q140 76 195 60" stroke="#F1F5F9" stroke-width="5" stroke-linecap="round"/>
+                    <!-- Trái tim nhỏ thêu trên khăn -->
+                    <path d="M140 86 C140 86 130 78 134 72 C137 68 140 73 140 73 C140 73 143 68 146 72 C150 78 140 86 140 86 Z" fill="#FF758F"/>
+                </svg>
+
+                <div class="scarf-messages">
+                    <div class="scarf-bubble" id="scarf-msg-1">Ebe tớ cứ chê khăn ý taa</div>
+                    <div class="scarf-bubble" id="scarf-msg-2">Khăn nè để giữ ấm cho ebe lỡ xa tớ nha</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="backToGifts()">← Back</button>
+    </section>
+
+    <!-- ==================== HỘP QUÀ 4: VŨ TRỤ HẠT HỒNG 3D ==================== -->
+    <section id="screen-gift-4" class="screen">
+        <canvas id="cosmic-canvas"></canvas>
+        <button class="back-btn dark-mode" onclick="backToGifts()">← Back</button>
+    </section>
+
+    <!-- ==================== TRANG CUỐI: LỜI CHÚC CUỐI CÙNG & HOẠT ẢNH ==================== -->
+    <section id="screen-final" class="screen">
+        <canvas id="final-canvas"></canvas>
+        <div class="final-overlay-text">
+            <h1>Giáng Sinh An Lành Nhé Ebe Của Tớ 🎄💖</h1>
+            <p>
+                Cảm ơn ebe vì đã mở hết tất cả hộp quà nhỏ này!<br>
+                Chúc công chúa của tớ một mùa Giáng Sinh thật ấm áp, luôn rạng rỡ, tự tin và hạnh phúc.<br>
+                Dù ở bất cứ đâu, tớ vẫn luôn ở đây thương ebe thật nhiều! ✨
+            </p>
+        </div>
+        <button class="back-btn dark-mode" onclick="backToGifts()">← Back</button>
+    </section>
+
+    <script>
+        /* =========================================================================
+           1. TẠO HỌA TIẾT TRÁI TIM CÁCH ĐIỆU UỐN ÉO DÀI RA CHO NỀN TRANG 2 & QUÀ 1,2,3
+           ========================================================================= */
+        function renderHeartSwirlBackgrounds() {
+            const containers = ['hearts-bg-2', 'hearts-bg-g1', 'hearts-bg-g2', 'hearts-bg-g3'];
+            const svgMarkup = `
+                <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Các đường uốn éo kéo dài thành hình trái tim cách điệu -->
+                    <path d="M-50 180 C120 40, 260 320, 420 140 C520 30, 620 190, 520 290 C420 390, 320 210, 460 110 C640 -20, 860 340, 1250 120" 
+                          stroke="#FFB3C1" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.65"/>
+                    <path d="M-40 620 C180 480, 310 760, 500 580 C610 470, 710 640, 600 740 C490 830, 390 650, 540 540 C740 390, 960 720, 1260 560" 
+                          stroke="#FF8FA3" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.55"/>
+                    <!-- Các trái tim cách điệu nét thanh dài uốn lượn -->
+                    <path d="M180 280 C180 220, 100 210, 110 280 C120 350, 180 410, 180 430 C180 410, 250 340, 260 270 C270 200, 180 220, 180 280 Z" 
+                          stroke="#FF758F" stroke-width="3" fill="none" opacity="0.45"/>
+                    <path d="M980 220 C980 150, 890 140, 900 220 C910 300, 980 370, 980 395 C980 370, 1060 290, 1070 210 C1080 130, 980 150, 980 220 Z" 
+                          stroke="#FF758F" stroke-width="3" fill="none" opacity="0.45"/>
+                    <path d="M840 560 C840 510, 770 500, 780 560 C790 620, 840 670, 840 690 C840 670, 900 610, 910 550 C920 490, 840 510, 840 560 Z" 
+                          stroke="#FFB3C1" stroke-width="3.5" fill="none" opacity="0.6"/>
+                    <path d="M290 540 C290 495, 230 485, 238 540 C246 595, 290 640, 290 655 C290 640, 342 585, 350 530 C358 475, 290 495, 290 540 Z" 
+                          stroke="#FFCCD5" stroke-width="4" fill="none" opacity="0.7"/>
+                </svg>
+            `;
+            containers.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = svgMarkup;
+            });
+        }
+        renderHeartSwirlBackgrounds();
+
+        /* =========================================================================
+           2. LOGIC TRANG 1: NHẬP PASSCODE (2 2 7)
+           ========================================================================= */
+        let enteredDigits = [];
+        let isCheckingPass = false;
+
+        function pressDigit(num) {
+            if (isCheckingPass || enteredDigits.length >= 3) return;
+
+            enteredDigits.push(num);
+            updateDigitDisplay();
+
+            if (enteredDigits.length === 3) {
+                verifyPasscode();
+            }
+        }
+
+        function updateDigitDisplay() {
+            for (let i = 0; i < 3; i++) {
+                const box = document.getElementById(`box-${i}`);
+                if (enteredDigits[i] !== undefined) {
+                    box.textContent = enteredDigits[i];
+                    box.classList.add('filled');
+                } else {
+                    box.textContent = '';
+                    box.classList.remove('filled');
+                }
+            }
+        }
+
+        function verifyPasscode() {
+            isCheckingPass = true;
+            const code = enteredDigits.join('');
+            const statusEl = document.getElementById('passcode-status');
+            const rowEl = document.getElementById('digit-row');
+
+            if (code === '227') {
+                statusEl.textContent = 'correct rồi ebe đáng yêu ạ';
+                statusEl.className = 'status-msg status-correct';
+                setTimeout(() => {
+                    switchScreen('screen-gifts');
+                    isCheckingPass = false;
+                }, 1100);
+            } else {
+                statusEl.textContent = 'incorrect rồi trả web cho ebe tui đi';
+                statusEl.className = 'status-msg status-incorrect';
+                rowEl.classList.add('shake');
+
+                setTimeout(() => {
+                    rowEl.classList.remove('shake');
+                    enteredDigits = [];
+                    updateDigitDisplay();
+                    isCheckingPass = false;
+                }, 850);
+            }
+        }
+
+        /* =========================================================================
+           3. QUẢN LÝ CHUYỂN TRANG & THEO DÕI 4 HỘP QUÀ ĐÃ MỞ
+           ========================================================================= */
+        const openedGifts = new Set();
+        let cosmicAnimFrame = null;
+        let finalAnimFrame = null;
+
+        function switchScreen(targetId) {
+            // Dừng các vòng lặp canvas nếu rời khỏi màn hình vũ trụ
+            if (targetId !== 'screen-gift-4' && cosmicAnimFrame) {
+                cancelAnimationFrame(cosmicAnimFrame);
+                cosmicAnimFrame = null;
+            }
+            if (targetId !== 'screen-final' && finalAnimFrame) {
+                cancelAnimationFrame(finalAnimFrame);
+                finalAnimFrame = null;
+            }
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const next = document.getElementById(targetId);
+            if (next) next.classList.add('active');
+        }
+
+        function openGift(giftIndex) {
+            const card = document.getElementById(`gift-card-${giftIndex}`);
+            if (card.classList.contains('opening')) return;
+
+            card.classList.add('opening');
+            openedGifts.add(giftIndex);
+
+            setTimeout(() => {
+                card.classList.remove('opening');
+                card.classList.add('opened-badge');
+
+                // Reset trạng thái riêng của từng hộp quà trước khi mở
+                if (giftIndex === 2) {
+                    resetMailState();
+                } else if (giftIndex === 3) {
+                    resetScarfState();
+                }
+
+                switchScreen(`screen-gift-${giftIndex}`);
+
+                if (giftIndex === 4) {
+                    startCosmicHeartToTextAnimation();
+                }
+            }, 620);
+        }
+
+        function backToGifts() {
+            switchScreen('screen-gifts');
+            // Kiểm tra nếu đã mở hết 4 hộp quà thì hiện nút sang trang cuối
+            if (openedGifts.size === 4) {
+                document.getElementById('btn-to-final').classList.add('visible');
+            }
+        }
+
+        function goToFinalScreen() {
+            switchScreen('screen-final');
+            startFinalCelebrationCanvas();
+        }
+
+        /* =========================================================================
+           4. HỘP QUÀ 2: HIỆU ỨNG MỞ MAIL & RÚT TỜ GIẤY
+           ========================================================================= */
+        function resetMailState() {
+            const env = document.getElementById('envelope-box');
+            const paper = document.getElementById('letter-paper');
+            env.style.display = 'flex';
+            env.classList.remove('open');
+            paper.classList.remove('visible');
+        }
+
+        function openMailLetter() {
+            const env = document.getElementById('envelope-box');
+            const paper = document.getElementById('letter-paper');
+            if (env.classList.contains('open')) return;
+
+            env.classList.add('open');
+            setTimeout(() => {
+                env.style.display = 'none';
+                paper.classList.add('visible');
+            }, 520);
+        }
+
+        /* =========================================================================
+           5. HỘP QUÀ 3: HIỆU ỨNG BẤM VÀO KHĂN QUÀNG CỔ
+           ========================================================================= */
+        function resetScarfState() {
+            document.getElementById('scarf-msg-1').classList.remove('show');
+            document.getElementById('scarf-msg-2').classList.remove('show');
+        }
+
+        function triggerScarfEffect(event) {
+            document.getElementById('scarf-msg-1').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('scarf-msg-2').classList.add('show');
+            }, 350);
+
+            // Bắn ra các sticker trái tim và mèo đáng yêu
+            const stickers = ['💖', '🐱', '💗', '🐾', '💕', '😻'];
+            const rect = event.currentTarget.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 14; i++) {
+                const span = document.createElement('span');
+                span.className = 'pop-sticker';
+                span.textContent = stickers[i % stickers.length];
+                span.style.fontSize = `${22 + Math.random() * 16}px`;
+                span.style.left = `${originX}px`;
+                span.style.top = `${originY}px`;
+
+                const angle = (Math.PI * 2 * i) / 14 + (Math.random() * 0.4);
+                const dist = 110 + Math.random() * 140;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist - 40;
+
+                span.style.setProperty('--tx', `${tx}px`);
+                span.style.setProperty('--ty', `${ty}px`);
+
+                document.body.appendChild(span);
+                setTimeout(() => span.remove(), 1800);
+            }
+        }
+
+        /* =========================================================================
+           6. HỘP QUÀ 4: VŨ TRỤ 3D - TRÁI TIM HỒNG PHÓNG TO -> TÁCH THÀNH CHỮ
+           ========================================================================= */
+        function startCosmicHeartToTextAnimation() {
+            const canvas = document.getElementById('cosmic-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            // Tạo các ngôi sao nền vũ trụ sâu thẳm
+            const stars = Array.from({ length: 240 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: Math.random() * 1.6 + 0.3,
+                alpha: Math.random(),
+                speed: Math.random() * 0.02 + 0.005
+            }));
+
+            // Lấy tọa độ điểm ảnh từ dòng chữ "Tớ yêu ebe của tớ lắm"
+            function getTextTargetPoints(text) {
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = width;
+                offCanvas.height = height;
+                const octx = offCanvas.getContext('2d');
+
+                const fontSize = Math.min(width * 0.072, 64);
+                octx.font = `700 ${fontSize}px 'Fredoka', 'Nunito', sans-serif`;
+                octx.fillStyle = '#ffffff';
+                octx.textAlign = 'center';
+                octx.textBaseline = 'middle';
+                octx.fillText(text, width / 2, height / 2);
+
+                const imgData = octx.getImageData(0, 0, width, height).data;
+                const pts = [];
+                const gap = width < 600 ? 3 : 4;
+
+                for (let y = 0; y < height; y += gap) {
+                    for (let x = 0; x < width; x += gap) {
+                        const idx = (y * width + x) * 4;
+                        if (imgData[idx + 3] > 150) {
+                            pts.push({ x, y });
+                        }
+                    }
+                }
+                return pts;
+            }
+
+            const textPoints = getTextTargetPoints('Tớ yêu ebe của tớ lắm');
+            const totalParticles = Math.max(textPoints.length, 2200);
+
+            // Tạo hàng ngàn đốm sáng hồng 3D hình trái tim khối cầu
+            const particles = [];
+            for (let i = 0; i < totalParticles; i++) {
+                // Phương trình tham số trái tim 2D + độ dày Z tạo khối 3D
+                const t = Math.random() * Math.PI * 2;
+                const fillScale = Math.pow(Math.random(), 0.45);
+                const hx = 16 * Math.pow(Math.sin(t), 3) * fillScale;
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * fillScale;
+                const hz = (Math.random() - 0.5) * 14 * (1 - fillScale * 0.5);
+
+                const target = textPoints[i % textPoints.length];
+                const pinkShades = ['#ff4d6d', '#ff758f', '#ff8fa3', '#ffb3c1', '#ff0a54', '#ffffff'];
+
+                particles.push({
+                    hx, hy, hz,
+                    x: width / 2,
+                    y: height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.5) * 14,
+                    tx: target.x,
+                    ty: target.y,
+                    size: Math.random() * 2.2 + 1.1,
+                    color: pinkShades[Math.floor(Math.random() * pinkShades.length)]
+                });
+            }
+
+            const startTime = performance.now();
+
+            function animate(now) {
+                const elapsed = (now - startTime) / 1000; // tính bằng giây
+
+                // Nền vũ trụ đen sâu có vệt mờ nhẹ
+                ctx.fillStyle = 'rgba(3, 1, 8, 0.35)';
+                ctx.fillRect(0, 0, width, height);
+
+                // Vẽ sao lấp lánh
+                stars.forEach(s => {
+                    s.alpha += s.speed;
+                    const a = 0.3 + Math.abs(Math.sin(s.alpha)) * 0.7;
+                    ctx.fillStyle = `rgba(255, 230, 240, ${a})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Giai đoạn 1 (0s -> 3.2s): Trái tim 3D nhỏ ở giữa dần phóng to và xoay nhẹ
+                // Giai đoạn 2 (3.2s -> 4.0s): Hàng ngàn đốm sáng bung tách ra ngoài vũ trụ
+                // Giai đoạn 3 (4.0s trở đi): Các đốm sáng hợp lại thành chữ "Tớ yêu ebe của tớ lắm"
+                const rotY = elapsed * 1.1;
+                const cosR = Math.cos(rotY);
+                const sinR = Math.sin(rotY);
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+
+                    if (elapsed < 3.2) {
+                        const progress = elapsed / 3.2;
+                        // Phóng to từ rất nhỏ (0.8) lên kích thước lớn (14)
+                        const heartScale = 0.8 + Math.pow(progress, 1.3) * 13.5;
+
+                        // Xoay 3D quanh trục Y
+                        const rx = p.hx * cosR - p.hz * sinR;
+                        const rz = p.hx * sinR + p.hz * cosR;
+                        const perspective = 260 / (260 + rz * 6);
+
+                        p.x = width / 2 + rx * heartScale * perspective;
+                        p.y = height / 2 + p.hy * heartScale * perspective;
+                    } else if (elapsed < 3.9) {
+                        // Bung tách hạt ra
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vx *= 0.96;
+                        p.vy *= 0.96;
+                    } else {
+                        // Hợp lại thành dòng chữ lấp lánh
+                        p.x += (p.tx - p.x) * 0.075;
+                        p.y += (p.ty - p.y) * 0.075;
+                    }
+
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                cosmicAnimFrame = requestAnimationFrame(animate);
+            }
+
+            cosmicAnimFrame = requestAnimationFrame(animate);
+        }
+
+        /* =========================================================================
+           7. HOẠT ẢNH VŨ TRỤ TRÁI TIM & SAO BĂNG CHO TRANG CUỐI CÙNG
+           ========================================================================= */
+        function startFinalCelebrationCanvas() {
+            const canvas = document.getElementById('final-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = window.innerWidth;
+            const height = canvas.height = window.innerHeight;
+
+            const floatingHearts = Array.from({ length: 65 }, () => ({
+                x: Math.random() * width,
+                y: height + Math.random() * height,
+                size: Math.random() * 14 + 8,
+                speedY: Math.random() * 1.6 + 0.8,
+                wobble: Math.random() * Math.PI * 2,
+                color: ['#ff4d6d', '#ff8fa3', '#ffb3c1', '#ffd166'][Math.floor(Math.random() * 4)]
+            }));
+
+            function drawMiniHeart(x, y, size, color) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-size / 2, -size / 2, -size, size / 3, 0, size);
+                ctx.bezierCurveTo(size, size / 3, size / 2, -size / 2, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function loop() {
+                ctx.fillStyle = 'rgba(8, 2, 16, 0.25)';
+                ctx.fillRect(0, 0, width, height);
+
+                floatingHearts.forEach(h => {
+                    h.y -= h.speedY;
+                    h.wobble += 0.03;
+                    const xOffset = Math.sin(h.wobble) * 18;
+
+                    if (h.y < -30) {
+                        h.y = height + 20;
+                        h.x = Math.random() * width;
+                    }
+
+                    drawMiniHeart(h.x + xOffset, h.y, h.size, h.color);
+                });
+
+                finalAnimFrame = requestAnimationFrame(loop);
+            }
+
+            finalAnimFrame = requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>
